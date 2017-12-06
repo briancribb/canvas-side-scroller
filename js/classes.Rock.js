@@ -67,9 +67,9 @@ var classes = classes || {}; // Giving a namespace to the class we're creating. 
 
 	Rock.prototype.update = function(elapsed) {
 		//console.log('this.vx: ' + this.vx);
-		this.x += (this.vx * elapsed);
-		this.y += (this.vy * elapsed);
-		this.rotation += (this.vr * elapsed);
+		//this.x += (this.vx * elapsed);
+		//this.y += (this.vy * elapsed);
+		//this.rotation += (this.vr * elapsed);
 	}
 
 }());

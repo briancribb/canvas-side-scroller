@@ -54,17 +54,12 @@ Page Visibility API and Polyfill for vendor prefixes:
 		numShips : 3,
 		rocks : [],
 		saucers : [],
-		missiles : [],
-		missileLife: 1000,
 		particles : [],
-		enemyMissiles : [],
 		level:{
 			current:0,
 			maxRocks:20,
 			rockBaseSpeed: 40,
 			rockSpeedMod: 10,
-			maxMissiles: 6,
-			missileSpeed: 150,
 			knobs: {
 				numRocks: 2,
 				rockSpeed:5
@@ -225,16 +220,6 @@ Page Visibility API and Polyfill for vendor prefixes:
 					GAME.rocks[i].update(elapsed);
 				};
 			},
-			updateMissiles: function( elapsed ) {
-				for (var i = 0; i < GAME.missiles.length; i++) {
-					if ( GAME.missiles[i].age > GAME.missileLife ) {
-						GAME.stage.removeChild(GAME.missiles[i]);
-						GAME.missiles.splice(i,1);
-					} else {
-						GAME.missiles[i].update(elapsed);
-					}
-				};
-			},
 			updateText: function( elapsed ) {
 				//console.log('updateText()');
 				//if (createjs.Ticker.getTicks() % 20 == 0) {
@@ -300,32 +285,6 @@ Page Visibility API and Polyfill for vendor prefixes:
 
 					var settings = null;
 
-					if ( GAME.missiles.length > 0 ) {
-
-						// Check against all missiles
-						missiles: for (var j = GAME.missiles.length - 1; j >= 0; j--) {
-							if ( GAME.utils.hitTestDistance( GAME.rocks[i], GAME.missiles[j] ) ) {
-
-								// Capture settings of the rock.
-								settings = breakRockSettings( GAME.rocks[i] );
-
-								// Remove the rock before adding any others.
-								GAME.score.total += GAME.score[GAME.rocks[i].size];
-								GAME.stage.removeChild(GAME.rocks[i]);
-								GAME.stage.removeChild(GAME.missiles[j]);
-								GAME.rocks.splice(i, 1);
-								GAME.missiles.splice(j, 1);
-
-								// If we have rock settings, add two more.
-								if (settings) {
-									GAME.utils.addRocks( 2, settings );
-								}
-
-								break rocks;
-								break missiles;
-							}
-						};
-					}
 
 					// Check the current rock against the ship
 					if ( GAME.utils.hitTestDistance( GAME.rocks[i], GAME.ship ) && GAME.ship.ready === true ) {
@@ -515,7 +474,6 @@ Page Visibility API and Polyfill for vendor prefixes:
 				frame : function(elapsed){
 
 					GAME.ship.fadeIn(elapsed);
-					GAME.utils.updateMissiles(elapsed);
 					GAME.utils.updateRocks(elapsed);
 					GAME.utils.checkHits();
 
@@ -562,23 +520,7 @@ Page Visibility API and Polyfill for vendor prefixes:
 								break;
 
 							case GAME.props.keycodes.SPACE: // down
-								if (GAME.ship.ready === true && GAME.missiles.length < 8) {
-									var tempVector = GAME.ship.getVector(
-										GAME.ship.vx,
-										GAME.ship.vy
-									);
-
-									var tempMissile = new classes.Missile({
-										x:		GAME.ship.x, 
-										y:		GAME.ship.y,
-										vx: 	GAME.ship.vx,
-										vy: 	GAME.ship.vy,
-										course:	GAME.ship.rotation,
-										born:	GAME.props.now
-									});
-									GAME.missiles.push(tempMissile);
-									GAME.stage.addChild(tempMissile);
-								}
+								// Stuff.
 								break;
 
 							default: return; // exit this handler for other keys
@@ -607,7 +549,6 @@ Page Visibility API and Polyfill for vendor prefixes:
 
 					// move 100 pixels per second (elapsedTimeInMS / 1000msPerSecond * pixelsPerSecond):
 					GAME.ship.update(elapsed);
-					GAME.utils.updateMissiles(elapsed);
 					GAME.utils.updateRocks(elapsed);
 					GAME.utils.wrapObjects(GAME.stage.children);
 					GAME.utils.checkHits();
@@ -659,12 +600,6 @@ Page Visibility API and Polyfill for vendor prefixes:
 						for (var i = GAME.rocks.length - 1; i >= 0; i--) {
 							GAME.stage.removeChild(GAME.rocks[i]);
 							GAME.rocks.splice(i, 1);
-						};
-					}
-					if (GAME.missiles.length > 0) {
-						for (var i = GAME.missiles.length - 1; i >= 0; i--) {
-							GAME.stage.removeChild(GAME.missiles[i]);
-							GAME.missiles.splice(i, 1);
 						};
 					}
 

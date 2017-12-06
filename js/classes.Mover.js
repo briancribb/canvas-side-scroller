@@ -7,7 +7,7 @@ var classes = classes || {}; // Giving a namespace to the class we're creating. 
 	ready, we will add it to our classes object to be used by an outside application.
 
 	It's important to note that this class is a base class which will act as a prototype for all of the moving objects 
-	in the game. All of them will be able to explode, for example, so I wanted that explosion function to be in the 
+	in the game. All of them will be able to move, for example, so I wanted the velocity and vector functions to be in the 
 	prototype so that it would exist just one time in memory.
 	*/
 

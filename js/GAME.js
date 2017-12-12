@@ -48,12 +48,10 @@ Page Visibility API and Polyfill for vendor prefixes:
 			fps: {},
 			level: {},
 			score: {},
-			ships: {}
+			sleds: {}
 		},
-		ship : {},
-		numShips : 3,
-		saucers : [],
-		particles : [],
+		sled : {},
+		numLives : 3,
 		level:{
 			current:0,
 			knobs: {
@@ -216,7 +214,7 @@ Page Visibility API and Polyfill for vendor prefixes:
 				//}
 				GAME.displayText.level.text = 'Level: ' + GAME.level.current;
 				GAME.displayText.score.text = 'Score: ' + GAME.score.total;
-				GAME.displayText.ships.text = 'Ships: ' + GAME.numShips;
+				GAME.displayText.sleds.text = 'Sleds: ' + GAME.numLives;
 			},
 			hitTestBox: function(object1, object2) {
 
@@ -344,9 +342,9 @@ Page Visibility API and Polyfill for vendor prefixes:
 				setup : function(){
 					// Any one-time tasks that happen when we switch to this state.
 					GAME.level.current = 0;
-					GAME.numShips = 3;
-					GAME.ship = null;
-					GAME.ship = new classes.Ship({
+					GAME.numLives = 3;
+					GAME.sled = null;
+					GAME.sled = new classes.Sled({
 						x:GAME.canvas.width/2, 
 						y:GAME.canvas.height/2
 					});
@@ -374,12 +372,12 @@ Page Visibility API and Polyfill for vendor prefixes:
 					GAME.displayText.score.name = 'txtScore';
 					GAME.stage.addChild(GAME.displayText.score);
 
-					GAME.displayText.ships = new createjs.Text( 'Ships: ' + GAME.numShips, '14px Arial', GAME.props.textColor );
-					GAME.displayText.ships.textAlign = "center";
-					GAME.displayText.ships.x = GAME.canvas.width/2;
-					GAME.displayText.ships.y = 10;
-					GAME.displayText.ships.name = 'txtShips';
-					GAME.stage.addChild(GAME.displayText.ships);
+					GAME.displayText.sleds = new createjs.Text( 'Sleds: ' + GAME.numLives, '14px Arial', GAME.props.textColor );
+					GAME.displayText.sleds.textAlign = "center";
+					GAME.displayText.sleds.x = GAME.canvas.width/2;
+					GAME.displayText.sleds.y = 10;
+					GAME.displayText.sleds.name = 'txtSleds';
+					GAME.stage.addChild(GAME.displayText.sleds);
 
 				},
 				frame : function(elapsed){
@@ -400,19 +398,20 @@ Page Visibility API and Polyfill for vendor prefixes:
 				cleanup : function(){
 				}
 			},
-			// Fades the player ship in from zero to full
+			// Fades the player sled in from zero to full
 			PLAYER_START : {
 				setup : function(){
 					// Any one-time tasks that happen when we switch to this state.
-					GAME.stage.addChild( GAME.ship );
+					GAME.stage.addChild( GAME.sled );
 					GAME.utils.updateText();
 				},
 				frame : function(elapsed){
 
-					GAME.ship.fadeIn(elapsed);
+					//GAME.sled.fadeIn(elapsed);
+					GAME.sled.ready = true;
 					GAME.utils.checkHits();
 
-					if (GAME.ship.ready === true) {
+					if (GAME.sled.ready === true) {
 						GAME.state.swap('PLAY_LEVEL');
 					}
 				},
@@ -434,20 +433,20 @@ Page Visibility API and Polyfill for vendor prefixes:
 								break;
 
 							case GAME.props.keycodes.LEFT: // left
-								if (GAME.ship.ready) {
-									GAME.ship.turn = 'left';
+								if (GAME.sled.ready) {
+									GAME.sled.turn = 'left';
 								}
 								break;
 
 							case GAME.props.keycodes.UP: // up
-								if (GAME.ship.ready) {
-									GAME.ship.thrust = true;
+								if (GAME.sled.ready) {
+									GAME.sled.thrust = true;
 								}
 								break;
 
 							case GAME.props.keycodes.RIGHT: // right
-								if (GAME.ship.ready) {
-									GAME.ship.turn = 'right';
+								if (GAME.sled.ready) {
+									GAME.sled.turn = 'right';
 								}
 								break;
 
@@ -464,15 +463,15 @@ Page Visibility API and Polyfill for vendor prefixes:
 					GAME.props.handlers.onkeyup = function(event) {
 						switch(event.which || event.keyCode) {
 							case GAME.props.keycodes.UP: // up
-								GAME.ship.thrust = false;
+								GAME.sled.thrust = false;
 								break;
 
 							case GAME.props.keycodes.LEFT: // left
-								GAME.ship.turn = '';
+								GAME.sled.turn = '';
 								break;
 
 							case GAME.props.keycodes.RIGHT: // right
-								GAME.ship.turn = '';
+								GAME.sled.turn = '';
 								break;
 
 							default: return; // exit this handler for other keys
@@ -483,7 +482,7 @@ Page Visibility API and Polyfill for vendor prefixes:
 					//GAME.displayText.fps.text = GAME.getFPS(elapsed);
 
 					// move 100 pixels per second (elapsedTimeInMS / 1000msPerSecond * pixelsPerSecond):
-					GAME.ship.update(elapsed);
+					GAME.sled.update(elapsed);
 					GAME.utils.wrapObjects(GAME.stage.children);
 					GAME.utils.checkHits();
 
@@ -494,12 +493,12 @@ Page Visibility API and Polyfill for vendor prefixes:
 				cleanup : function(){
 				}
 			},
-			// The player ship blows up and returns to PLAYER_START, if the player has ships.
+			// The player sled blows up and returns to PLAYER_START, if the player has sleds.
 			PLAYER_DIE : {
 				setup : function(){
-					GAME.numShips --;
-					if (GAME.numShips < 1) {
-						GAME.stage.removeChild(GAME.ship);
+					GAME.numLives --;
+					if (GAME.numLives < 1) {
+						GAME.stage.removeChild(GAME.sled);
 						GAME.state.swap('GAME_OVER');
 					} else {
 						GAME.state.swap('PLAYER_START');
@@ -509,10 +508,10 @@ Page Visibility API and Polyfill for vendor prefixes:
 					GAME.utils.updateText();
 				},
 				cleanup : function(){
-					GAME.ship.reset();
+					GAME.sled.reset();
 				}
 			},
-			// The player is out of ships, so display the final score.
+			// The player is out of lives, so display the final score.
 			GAME_OVER : {
 				setup : function(){
 

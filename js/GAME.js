@@ -52,17 +52,11 @@ Page Visibility API and Polyfill for vendor prefixes:
 		},
 		ship : {},
 		numShips : 3,
-		rocks : [],
 		saucers : [],
 		particles : [],
 		level:{
 			current:0,
-			maxRocks:20,
-			rockBaseSpeed: 40,
-			rockSpeedMod: 10,
 			knobs: {
-				numRocks: 2,
-				rockSpeed:5
 			}
 		},
 		pause: function() {
@@ -215,11 +209,6 @@ Page Visibility API and Polyfill for vendor prefixes:
 				GAME.props.handlers.onkeydown = function(){return;};
 				GAME.props.handlers.onkeyup = function(){return;};
 			},
-			updateRocks: function( elapsed ) {
-				for (var i = 0; i < GAME.rocks.length; i++) {
-					GAME.rocks[i].update(elapsed);
-				};
-			},
 			updateText: function( elapsed ) {
 				//console.log('updateText()');
 				//if (createjs.Ticker.getTicks() % 20 == 0) {
@@ -228,21 +217,6 @@ Page Visibility API and Polyfill for vendor prefixes:
 				GAME.displayText.level.text = 'Level: ' + GAME.level.current;
 				GAME.displayText.score.text = 'Score: ' + GAME.score.total;
 				GAME.displayText.ships.text = 'Ships: ' + GAME.numShips;
-			},
-			addRocks: function( numRocks, settings ) {
-				var settings = settings || {};
-				for (var i = 0; i < numRocks; i++) {
-
-					var tempRock = new classes.Rock({
-						x:		settings.x		|| 10 + ( Math.floor( Math.random() * (GAME.canvas.width - 10) ) ),
-						y:		settings.y		|| 10 + ( Math.floor( Math.random() * (GAME.canvas.height - 10) ) ),
-						course:	settings.course	|| Math.floor( Math.random() * 360 ),
-						speed:	settings.speed	|| GAME.level.rockBaseSpeed + GAME.level.knobs.rockSpeed,
-						size:	settings.size	|| 'large'
-					});
-					GAME.stage.addChild(tempRock);
-					GAME.rocks.push(tempRock);
-				};
 			},
 			hitTestBox: function(object1, object2) {
 
@@ -281,43 +255,6 @@ Page Visibility API and Polyfill for vendor prefixes:
 				return false;
 			},
 			checkHits: function() {
-				rocks: for (var i = GAME.rocks.length - 1; i >= 0; i--) {
-
-					var settings = null;
-
-
-					// Check the current rock against the ship
-					if ( GAME.utils.hitTestDistance( GAME.rocks[i], GAME.ship ) && GAME.ship.ready === true ) {
-
-						// Capture settings of the rock.
-						settings = breakRockSettings( GAME.rocks[i] );
-
-						GAME.stage.removeChild(GAME.rocks[i]);
-						GAME.rocks.splice(i, 1);
-						if (settings) {
-							GAME.utils.addRocks( 2, settings );
-						}
-
-						GAME.state.swap('PLAYER_DIE', true);
-
-						break rocks;
-					}
-
-
-
-
-					function breakRockSettings(rock) {
-						var settings = null;
-						if (rock.size !== 'small') {
-							settings = {
-								x: rock.x,
-								y: rock.y,
-								size : (rock.size === 'large') ? 'medium' : 'small'
-							}
-						}
-						return settings;
-					}
-				};
 			},
 			wrapObjects: function(wrapArray) {
 				for (var i = 0; i < wrapArray.length; i++) {
@@ -451,12 +388,11 @@ Page Visibility API and Polyfill for vendor prefixes:
 				cleanup : function(){
 				}
 			},
-			// Sets the level knobs and populates the screen with rocks
+			// Sets the level knobs
 			NEW_LEVEL : {
 				setup : function(){
 					// Any one-time tasks that happen when we switch to this state.
 					GAME.level.current ++;
-					GAME.utils.addRocks( GAME.level.current + GAME.level.knobs.numRocks );
 				},
 				frame : function(elapsed){
 					GAME.state.swap('PLAYER_START');
@@ -474,7 +410,6 @@ Page Visibility API and Polyfill for vendor prefixes:
 				frame : function(elapsed){
 
 					GAME.ship.fadeIn(elapsed);
-					GAME.utils.updateRocks(elapsed);
 					GAME.utils.checkHits();
 
 					if (GAME.ship.ready === true) {
@@ -549,15 +484,12 @@ Page Visibility API and Polyfill for vendor prefixes:
 
 					// move 100 pixels per second (elapsedTimeInMS / 1000msPerSecond * pixelsPerSecond):
 					GAME.ship.update(elapsed);
-					GAME.utils.updateRocks(elapsed);
 					GAME.utils.wrapObjects(GAME.stage.children);
 					GAME.utils.checkHits();
 
 					GAME.utils.updateText();
 
-					if ( GAME.rocks.length === 0 && GAME.ship.ready === true ) {
-						GAME.state.swap('NEW_LEVEL');
-					}
+					//GAME.state.swap('NEW_LEVEL');
 				},
 				cleanup : function(){
 				}
@@ -594,15 +526,6 @@ Page Visibility API and Polyfill for vendor prefixes:
 							default: return; // exit this handler for other keys
 						}
 					}
-
-
-					if (GAME.rocks.length > 0) {
-						for (var i = GAME.rocks.length - 1; i >= 0; i--) {
-							GAME.stage.removeChild(GAME.rocks[i]);
-							GAME.rocks.splice(i, 1);
-						};
-					}
-
 
 					/* Creating the title screen. */
 					var title = new createjs.Text( 'GAME OVER', '24px Arial', '#ffffff' );

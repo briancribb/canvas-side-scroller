@@ -52,7 +52,10 @@ Page Visibility API and Polyfill for vendor prefixes:
 		},
 		ship : {},
 		numShips : 3,
+<<<<<<< HEAD
 		saucers : [],
+=======
+>>>>>>> origin/master
 		particles : [],
 		level:{
 			current:0,
@@ -255,6 +258,10 @@ Page Visibility API and Polyfill for vendor prefixes:
 				return false;
 			},
 			checkHits: function() {
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 			},
 			wrapObjects: function(wrapArray) {
 				for (var i = 0; i < wrapArray.length; i++) {
@@ -489,7 +496,10 @@ Page Visibility API and Polyfill for vendor prefixes:
 
 					GAME.utils.updateText();
 
+<<<<<<< HEAD
 					//GAME.state.swap('NEW_LEVEL');
+=======
+>>>>>>> origin/master
 				},
 				cleanup : function(){
 				}
@@ -527,6 +537,10 @@ Page Visibility API and Polyfill for vendor prefixes:
 						}
 					}
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 					/* Creating the title screen. */
 					var title = new createjs.Text( 'GAME OVER', '24px Arial', '#ffffff' );
 					title.textAlign = "center";

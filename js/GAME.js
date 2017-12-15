@@ -326,10 +326,12 @@ Page Visibility API and Polyfill for vendor prefixes:
 					subtitle.y = GAME.canvas.height/2 + 10;
 					subtitle.name = 'subtitle';
 					GAME.stage.addChild(subtitle);
+
 				},
 				frame : function(elapsed){
 					// State function to run on each tick.
 					GAME.utils.updateText();
+					GAME.state.swap('NEW_GAME');
 				},
 				cleanup : function(elapsed){
 					// Remove the title stuff, but leave the score.

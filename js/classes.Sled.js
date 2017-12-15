@@ -19,7 +19,7 @@ var classes = classes || {}; // Giving a namespace to the class we're creating. 
 		this.regX			= this.width/2;				// Setting the registration point so we can rotate around the center of the square.
 		this.regY			= this.height/2;
 		this.radius			= 18;
-		this.rotation		= -90;						// This is the default value anyway, but I wanted to set it here for readability.
+		this.rotation		= 0;						// This is the default value anyway, but I wanted to set it here for readability.
 		this.alpha			= 1;						// This is the default value anyway, but I wanted to set it here for readability.
 		this.cos			= 1;
 		this.sin			= 1;
@@ -52,6 +52,15 @@ var classes = classes || {}; // Giving a namespace to the class we're creating. 
 
 
 	var grSled			=	new createjs.Graphics()
+								.setStrokeStyle(2)
+								.beginStroke("#ffffff")
+									.moveTo(-24,0)
+									.arcTo(24, 0, 30, -30, 20);
+
+
+
+
+	var grSled2			=	new createjs.Graphics()
 								.setStrokeStyle(1)
 								.beginFill("#ffffff")
 									.drawCircle(12, 10, 2)
@@ -104,7 +113,7 @@ var classes = classes || {}; // Giving a namespace to the class we're creating. 
 		this.x = GAME.canvas.width/2; 
 		this.y = GAME.canvas.height/2;
 		this.alpha = 0;
-		this.rotation = -90;
+		this.rotation = 0;
 		this.vx = 0;
 		this.vy = 0;
 		this.thrust = false;

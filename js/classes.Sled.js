@@ -54,8 +54,8 @@ var classes = classes || {}; // Giving a namespace to the class we're creating. 
 	var grSled			=	new createjs.Graphics()
 								.setStrokeStyle(2)
 								.beginStroke("#ffffff")
-									.moveTo(-24,0)
-									.arcTo(24, 0, 30, -30, 20);
+								.drawRect(-30,-20,60,40)
+									.moveTo(-24,0);
 
 
 

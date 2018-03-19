@@ -31,8 +31,8 @@ Page Visibility API and Polyfill for vendor prefixes:
 				DOWN:	40
 			},
 			handlers: {
-				onkeydown:function(){return;},
-				onkeyup:function(){return;}
+				down:function(){return;},
+				up:function(){return;}
 			},
 			assets: [
 				{id:"codeschool_logo", src:"img/2014_09_16_20_43_07_Logo-horizontal.png"}
@@ -138,14 +138,15 @@ Page Visibility API and Polyfill for vendor prefixes:
 
 
 				// http://stackoverflow.com/questions/1402698/binding-arrow-keys-in-js-jquery
-				document.onkeydown = function(event) {
-					GAME.props.handlers.onkeydown( event || window.event );
+				document.addEventListener('keydown', function(evt) {
 					event.preventDefault(); // prevent the default action (scroll / move caret)
-				};
-				document.onkeyup = function(event) {
-					GAME.props.handlers.onkeyup( event || window.event );
+					GAME.props.handlers.down(evt);
+				});
+
+				document.addEventListener('keyup', function(evt) {
 					event.preventDefault(); // prevent the default action (scroll / move caret)
-				};
+					GAME.props.handlers.up(evt);
+				});
 
 
 				// CreateJS Ticker
@@ -204,8 +205,8 @@ Page Visibility API and Polyfill for vendor prefixes:
 		},
 		utils: {
 			resetListeners: function() {
-				GAME.props.handlers.onkeydown = function(){return;};
-				GAME.props.handlers.onkeyup = function(){return;};
+				GAME.props.handlers.down = function(){return;};
+				GAME.props.handlers.up = function(){return;};
 			},
 			updateText: function( elapsed ) {
 				//console.log('updateText()');
@@ -302,7 +303,7 @@ Page Visibility API and Polyfill for vendor prefixes:
 			},
 			TITLE : {
 				setup : function(elapsed){
-					GAME.props.handlers.onkeyup = function(event) {
+					GAME.props.handlers.up = function(event) {
 						switch(event.which || event.keyCode) {
 							case GAME.props.keycodes.SPACE: // left
 								GAME.state.swap('NEW_GAME');
@@ -424,7 +425,7 @@ Page Visibility API and Polyfill for vendor prefixes:
 			PLAY_LEVEL : {
 				setup : function(){
 					// Any one-time tasks that happen when we switch to this state.
-					GAME.props.handlers.onkeydown = function(event) {
+					GAME.props.handlers.down = function(event) {
 						switch(event.which || event.keyCode) {
 							case GAME.props.keycodes.p: // p
 								if (createjs.Ticker.getPaused() === true) {
@@ -434,21 +435,9 @@ Page Visibility API and Polyfill for vendor prefixes:
 								}
 								break;
 
-							case GAME.props.keycodes.LEFT: // left
-								if (GAME.sled.ready) {
-									GAME.sled.turn = 'left';
-								}
-								break;
-
 							case GAME.props.keycodes.UP: // up
 								if (GAME.sled.ready) {
 									GAME.sled.thrust = true;
-								}
-								break;
-
-							case GAME.props.keycodes.RIGHT: // right
-								if (GAME.sled.ready) {
-									GAME.sled.turn = 'right';
 								}
 								break;
 
@@ -462,18 +451,10 @@ Page Visibility API and Polyfill for vendor prefixes:
 							default: return; // exit this handler for other keys
 						}
 					}
-					GAME.props.handlers.onkeyup = function(event) {
+					GAME.props.handlers.up = function(event) {
 						switch(event.which || event.keyCode) {
 							case GAME.props.keycodes.UP: // up
 								GAME.sled.thrust = false;
-								break;
-
-							case GAME.props.keycodes.LEFT: // left
-								GAME.sled.turn = '';
-								break;
-
-							case GAME.props.keycodes.RIGHT: // right
-								GAME.sled.turn = '';
 								break;
 
 							default: return; // exit this handler for other keys
@@ -518,7 +499,7 @@ Page Visibility API and Polyfill for vendor prefixes:
 				setup : function(){
 
 
-					GAME.props.handlers.onkeyup = function(event) {
+					GAME.props.handlers.up = function(event) {
 						switch(event.which || event.keyCode) {
 							case GAME.props.keycodes.n: // left
 								GAME.state.swap('NEW_GAME');

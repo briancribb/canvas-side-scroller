@@ -7,6 +7,9 @@ Page Visibility API and Polyfill for vendor prefixes:
 	http://www.w3.org/TR/page-visibility/
 	http://caniuse.com/#feat=pagevisibility
 	http://jsfiddle.net/0GiS0/cAG5N/
+
+createjs.Tween.get(GAME.sled).to({x:GAME.sled.x - 100}, 500, createjs.Ease.linear);
+
 */
 //(function(){
 	/*
@@ -52,6 +55,7 @@ Page Visibility API and Polyfill for vendor prefixes:
 		},
 		sled : {},
 		numLives : 3,
+		rowSize: 50,
 		level:{
 			current:0,
 			knobs: {
@@ -437,11 +441,18 @@ Page Visibility API and Polyfill for vendor prefixes:
 
 							case GAME.props.keycodes.UP: // up
 								if (GAME.sled.ready) {
-									GAME.sled.thrust = true;
+									GAME.sled.ready = false;
+									console.log("Sled is ready so it's going UP.");
+									createjs.Tween.get(GAME.sled).to({y:GAME.sled.y - GAME.rowSize}, 500, createjs.Ease.linear).call(handleComplete);
 								}
 								break;
 
 							case GAME.props.keycodes.DOWN: // down
+								if (GAME.sled.ready) {
+									GAME.sled.ready = false;
+									console.log("Sled is ready so it's going DOWN.");
+									createjs.Tween.get(GAME.sled).to({y:GAME.sled.y + GAME.rowSize}, 500, createjs.Ease.linear).call(handleComplete);
+								}
 								break;
 
 							case GAME.props.keycodes.SPACE: // down
@@ -450,6 +461,13 @@ Page Visibility API and Polyfill for vendor prefixes:
 
 							default: return; // exit this handler for other keys
 						}
+
+						function handleComplete() {
+							console.log('handleComplete()');
+							GAME.sled.ready = true;
+						}
+
+
 					}
 					GAME.props.handlers.up = function(event) {
 						switch(event.which || event.keyCode) {

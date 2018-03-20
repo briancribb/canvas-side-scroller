@@ -443,7 +443,7 @@ createjs.Tween.get(GAME.sled).to({x:GAME.sled.x - 100}, 500, createjs.Ease.linea
 								if (GAME.sled.ready) {
 									GAME.sled.ready = false;
 									console.log("Sled is ready so it's going UP.");
-									createjs.Tween.get(GAME.sled).to({y:GAME.sled.y - GAME.rowSize}, 500, createjs.Ease.linear).call(handleComplete);
+									createjs.Tween.get(GAME.sled).to({y:GAME.sled.y - GAME.rowSize}, GAME.sled.duration, createjs.Ease.linear).call(handleComplete);
 								}
 								break;
 
@@ -451,7 +451,7 @@ createjs.Tween.get(GAME.sled).to({x:GAME.sled.x - 100}, 500, createjs.Ease.linea
 								if (GAME.sled.ready) {
 									GAME.sled.ready = false;
 									console.log("Sled is ready so it's going DOWN.");
-									createjs.Tween.get(GAME.sled).to({y:GAME.sled.y + GAME.rowSize}, 500, createjs.Ease.linear).call(handleComplete);
+									createjs.Tween.get(GAME.sled).to({y:GAME.sled.y + GAME.rowSize}, GAME.sled.duration, createjs.Ease.linear).call(handleComplete);
 								}
 								break;
 
@@ -470,13 +470,8 @@ createjs.Tween.get(GAME.sled).to({x:GAME.sled.x - 100}, 500, createjs.Ease.linea
 
 					}
 					GAME.props.handlers.up = function(event) {
-						switch(event.which || event.keyCode) {
-							case GAME.props.keycodes.UP: // up
-								GAME.sled.thrust = false;
-								break;
 
-							default: return; // exit this handler for other keys
-						}
+
 					}
 				},
 				frame : function(elapsed){

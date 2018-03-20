@@ -14,22 +14,14 @@ var classes = classes || {}; // Giving a namespace to the class we're creating. 
 		// Assign properties from what is passed in.
 		this.x				= settings.x || 0;
 		this.y				= settings.y || 0;
-		this.width			= 24;						// All of our squares will be the same size.
-		this.height			= 20;
+		this.width			= 60;						// All of our squares will be the same size.
+		this.height			= 40;
 		this.regX			= this.width/2;				// Setting the registration point so we can rotate around the center of the square.
 		this.regY			= this.height/2;
 		this.radius			= 18;
 		this.rotation		= 0;						// This is the default value anyway, but I wanted to set it here for readability.
-		this.alpha			= 1;						// This is the default value anyway, but I wanted to set it here for readability.
-		this.cos			= 1;
-		this.sin			= 1;
-		this.vx				= 0;
-		this.vy				= 0;
-		this.vr				= settings.vx || 130;
-		this.accel			= 3;
-		this.maxVelocity	= 400;
-		this.thrust			= false;
-		this.turn			= '';
+		this.alpha			= 1;
+		this.duration		= 350;						// This is the default value anyway, but I wanted to set it here for readability.
 		this.ready			= false;
 
 		this.setBounds(  0, 0, this.width, this.height ); 
@@ -114,49 +106,11 @@ var classes = classes || {}; // Giving a namespace to the class we're creating. 
 		this.y = GAME.canvas.height/2;
 		this.alpha = 0;
 		this.rotation = 0;
-		this.vx = 0;
-		this.vy = 0;
-		this.thrust = false;
 		this.ready = false;
-		this.turn = '';
 	}
 
 	Sled.prototype.update = function(elapsed) {
-		if (this.thrust === false) {
-			this.graphics = grSled;
-		} else {
-			var radians = this.rotation * Math.PI / 180;
-			this.cos = Math.cos(radians);
-			this.sin = Math.sin(radians);
-			this.graphics = grSledThrust;
-
-
-			var vxNew = this.vx+this.accel*this.cos,
-				vyNew = this.vy+this.accel*this.sin
-
-
-			if ( vxNew < -(this.maxVelocity) ) {
-				vxNew = -(this.maxVelocity);
-			} else if ( vxNew > this.maxVelocity ) {
-				vxNew = this.maxVelocity;
-			}
-
-			if ( vyNew < -(this.maxVelocity) ) {
-				vyNew = -(this.maxVelocity);
-			} else if ( vyNew > this.maxVelocity ) {
-				vyNew = this.maxVelocity;
-			}
-
-			this.vx = vxNew;
-			this.vy = vyNew;
-		}
-		if (this.turn === 'right') {
-			this.rotation += this.vr * elapsed;
-		} else if (this.turn === 'left') {
-			this.rotation -= this.vr * elapsed;
-		}
-		this.x += (this.vx * elapsed);
-		this.y += (this.vy * elapsed);
+		this.graphics = grSled;
 	}
 
 }());

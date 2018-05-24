@@ -21,11 +21,12 @@ let buildGame = function(targetID, classes) {
         onkeyup:function(){return;}
       }
     },
+    rowSize:50,
+    arrTeam: [],
     displayText :  {
       fps: {},
       level: {}
     },
-    sled : {},
     numSleds : 3,
     level:{
       current:0,
@@ -276,14 +277,41 @@ let buildGame = function(targetID, classes) {
           console.log('PLAYER_START.setup()');
           // Any one-time tasks that happen when we switch to this state.
 
+          // Dogs are 15 pixels wide.
+          GAME.leadDog = new classes.Dog({name:'leadDog'});
+          GAME.swingDog = new classes.Dog({name:'swingDog'});
+          GAME.teamDog = new classes.Dog({name:'teamDog'});
+          GAME.wheelDog = new classes.Dog({name:'wheelDog'});
 
-          GAME.leadDog = new classes.Dog({
-            x:GAME.canvas.width/2,
-            y:GAME.canvas.height/2
+          GAME.sled = new classes.Sled({
+            name: 'sled',
+            x: 50,
+            y: GAME.canvas.height/2
           });
-          GAME.stage.addChild(GAME.leadDog);
+
+          // For hit tests and cleanup.
+          GAME.sledTeam = [
+            GAME.leadDog,
+            GAME.swingDog,
+            GAME.teamDog,
+            GAME.wheelDog,
+            GAME.sled
+          ];
 
 
+          GAME.stage.addChild(GAME.sled);
+
+          // Place the dog team.
+          for (var i = GAME.sledTeam.length - 2; i >= 0; i--) {
+            let current = GAME.sledTeam[i],
+                previous = GAME.sledTeam[i+1];
+
+            current.x = previous.x + previous.width + 15;
+            current.y = GAME.sled.y;
+            GAME.stage.addChild(current);
+            console.log(previous.x, previous.width, current.name, current.x);
+          }
+          console.log(GAME.stage.children);
 
 
         },
@@ -317,6 +345,7 @@ let buildGame = function(targetID, classes) {
 
               case GAME.props.keycodes.UP: // up
                 console.log('up');
+                GAME.sled.move( -(GAME.rowSize) );
                 break;
 
               case GAME.props.keycodes.RIGHT: // right
@@ -325,6 +354,7 @@ let buildGame = function(targetID, classes) {
 
               case GAME.props.keycodes.DOWN: // down
                 console.log('down');
+                GAME.sled.move(GAME.rowSize);
                 break;
 
               case GAME.props.keycodes.SPACE: // space

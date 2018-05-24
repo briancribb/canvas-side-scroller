@@ -58,6 +58,17 @@ let buildMover = function() {
 		}
 	};
 	Mover.prototype.returnString = function(str) {return str+" and things"};
+
+	Mover.prototype.move = function(distance) {
+		console.log('Moving...');
+		let target = this;
+		createjs.Tween.get(target)
+			//.wait(500)
+			.to({y:target.y+distance}, 500)
+			//.call(handleComplete);
+	}
+
+
 	/*
 	Now we're actually going to create the class and use it. Any methods we override 
 	will be renamed to prefix_methodName(), as in: Container_draw(). We're adding the 

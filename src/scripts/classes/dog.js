@@ -8,12 +8,13 @@ let buildDog = function(classes) {
 		this.height	= 10;
 		this.regX	= settings.regX || 0;
 		this.regY	= settings.regY || 0;
+		this.color	= settings.color || '#fff';
 
 		this.setBounds(  0, 0, this.width, this.height );
 		//this.graphics.beginFill("red").drawCircle(0, 0, 40);
-		this.graphics.beginFill("#BADA55").drawRect(0, -this.height, this.width, this.height);
+		this.graphics.beginFill(this.color).drawRect(0, -this.height, this.width, this.height);
 		//this.graphics = grDog;
-		console.log(['Dog()', this]);
+		//console.log(['Dog()', this]);
 	};
 
 	Dog.prototype = createjs.extend(Dog, classes.Mover);

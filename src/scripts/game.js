@@ -278,10 +278,17 @@ let buildGame = function(targetID, classes) {
           // Any one-time tasks that happen when we switch to this state.
 
           // Dogs are 15 pixels wide.
-          GAME.leadDog = new classes.Dog({name:'leadDog'});
-          GAME.swingDog = new classes.Dog({name:'swingDog'});
-          GAME.teamDog = new classes.Dog({name:'teamDog'});
-          GAME.wheelDog = new classes.Dog({name:'wheelDog'});
+          GAME.leadDog = new classes.Dog({name:'leadDog', color:'#BADA55'});
+          GAME.swingDog = new classes.Dog({name:'swingDog', color:'#f00'});
+          GAME.teamDog = new classes.Dog({name:'teamDog', color:'#0f0'});
+          GAME.wheelDog = new classes.Dog({name:'wheelDog', color:'#00f'});
+
+          let sledDogs = [
+            GAME.leadDog,
+            GAME.swingDog,
+            GAME.teamDog,
+            GAME.wheelDog,
+          ];
 
           GAME.sled = new classes.Sled({
             name: 'sled',
@@ -289,15 +296,8 @@ let buildGame = function(targetID, classes) {
             y: GAME.canvas.height/2
           });
 
-          // For hit tests and cleanup.
-          GAME.sledTeam = [
-            GAME.leadDog,
-            GAME.swingDog,
-            GAME.teamDog,
-            GAME.wheelDog,
-            GAME.sled
-          ];
-
+          GAME.sledTeam = sledDogs.concat([GAME.sled]);
+          GAME.sled.team = GAME.sledTeam;
 
           GAME.stage.addChild(GAME.sled);
 
@@ -309,10 +309,7 @@ let buildGame = function(targetID, classes) {
             current.x = previous.x + previous.width + 15;
             current.y = GAME.sled.y;
             GAME.stage.addChild(current);
-            console.log(previous.x, previous.width, current.name, current.x);
           }
-          console.log(GAME.stage.children);
-
 
         },
         frame : function(elapsed){
@@ -345,7 +342,7 @@ let buildGame = function(targetID, classes) {
 
               case GAME.props.keycodes.UP: // up
                 console.log('up');
-                GAME.sled.move( -(GAME.rowSize) );
+                GAME.sled.moveTeam( 100 );
                 break;
 
               case GAME.props.keycodes.RIGHT: // right
@@ -354,7 +351,7 @@ let buildGame = function(targetID, classes) {
 
               case GAME.props.keycodes.DOWN: // down
                 console.log('down');
-                GAME.sled.move(GAME.rowSize);
+                GAME.sled.moveTeam( 200 );
                 break;
 
               case GAME.props.keycodes.SPACE: // space
@@ -381,6 +378,9 @@ let buildGame = function(targetID, classes) {
           // move 100 pixels per second: 
           // (elapsedTimeInMS / 1000msPerSecond * pixelsPerSecond):
           GAME.utils.updateText();
+          for (var i = GAME.sledTeam.length - 1; i >= 0; i--) {
+            GAME.sledTeam[i].update();
+          }
           // GAME.state.swap('PLAYER_DIE');
         },
         cleanup : function(){
@@ -441,7 +441,6 @@ let buildGame = function(targetID, classes) {
       }
     }
    }
-   console.log([targetID, classes, GAME]);
    return GAME;
 }; // End of buildGame()
 export default buildGame;

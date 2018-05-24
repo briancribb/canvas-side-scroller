@@ -8,6 +8,7 @@ let buildSled = function(classes) {
 		this.height	= 15;
 		this.regX	= settings.regX || 0;
 		this.regY	= settings.regY || 0;
+		this.ready	= true;
 
 		this.setBounds(  0, 0, this.width, this.height );
 		//this.graphics.beginFill("red").drawCircle(0, 0, 40);
@@ -25,13 +26,27 @@ let buildSled = function(classes) {
 							.drawRect(-(this.width/2),-(this.height/2),this.width,this.height);
 	*/
 
-	Sled.prototype.moveTeam = function(distance) {
+	Sled.prototype.moveTeam = function(yPoint) {
+		let sled = this;
+		//sled.moveTo(yPoint);
+		console.log(sled.team);
+		let waitTime = 0;
+		for (var i = 0; i < sled.team.length; i++) {
+			let dog = sled.team[i];
 
+			createjs.Tween.get(dog)
+				.wait(waitTime)
+				.to({y:yPoint}, 500)
+				.call(function(){
+					//console.log('All done...');
+				});
 
+			waitTime += 75;
+		}
 	}
 
 	Sled.prototype.update = function(elapsed) {
-		this.graphics = grSled;
+
 	}
 
 

@@ -22,6 +22,7 @@ let buildMover = function() {
 		this is just a base class. This exists only to provide common methods to 
 		subsequent classes. 
 		*/
+		this.ready = true;
 	};
 	/*
 	createjs.extend() builds our temporary object up with the parent as it's prototype. 
@@ -59,13 +60,18 @@ let buildMover = function() {
 	};
 	Mover.prototype.returnString = function(str) {return str+" and things"};
 
-	Mover.prototype.move = function(distance) {
+	Mover.prototype.moveTo = function(yPoint, callback) {
 		console.log('Moving...');
 		let target = this;
 		createjs.Tween.get(target)
 			//.wait(500)
-			.to({y:target.y+distance}, 500)
-			//.call(handleComplete);
+			.to({y:yPoint}, 500)
+			.call(function(){
+				//console.log('All done...');
+				if (callback) {
+					callback();
+				}
+			});
 	}
 
 

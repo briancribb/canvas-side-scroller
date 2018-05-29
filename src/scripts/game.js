@@ -1,11 +1,14 @@
 let buildGame = function(targetID, classes) {
   "use strict"
   // The targetID variable is available to the entire file.
+  let gameWidth = 600,
+      gameHeight = 400;
+
 
   let GAME = {
     props: {
-      width:600,    // Used when creating the canvas and testing its bounds.
-      height:400,
+      width:gameWidth,    // Used when creating the canvas and testing its bounds.
+      height:gameHeight,
       textColor: '#FFFD8A',
       keycodes: {
         p:    80, 
@@ -21,15 +24,22 @@ let buildGame = function(targetID, classes) {
         onkeyup:function(){return;}
       }
     },
-    rowSize:50,
-    arrTeam: [],
+    currentRow:2,
+    rows:[
+        gameHeight * .20,
+        gameHeight * .36,
+        gameHeight * .52,
+        gameHeight * .68,
+        gameHeight * .84
+    ],
+    sledTeam: [],
     displayText :  {
       fps: {},
       level: {}
     },
     numSleds : 3,
     level:{
-      current:0,
+      current:1,
       knobs: {
       }
     },
@@ -40,7 +50,7 @@ let buildGame = function(targetID, classes) {
       createjs.Ticker.paused = false;
     },
     init: function() {
-      console.log('GAME.init()');
+      //console.log('GAME.init()');
       /* Setting strings to match vendor visibility names. */
       if (typeof document.hidden !== "undefined") {
         GAME.hidden = "hidden", GAME.visibilityChange = "visibilitychange", GAME.visibilityState = "visibilityState";
@@ -60,6 +70,7 @@ let buildGame = function(targetID, classes) {
       GAME.state.swap('LOADING', true);
       GAME.setup.addListeners();
       GAME.play();
+      console.log(GAME);
     },
     setup: {
       createCanvas: function() {
@@ -122,7 +133,7 @@ let buildGame = function(targetID, classes) {
       updateText: function( elapsed ) {
         //console.log('updateText()');
         if (createjs.Ticker.getTicks() % 20 == 0) {
-          GAME.displayText.fps.text = GAME.getFPS(elapsed);
+          GAME.displayText.fps.text = "FPS: " + GAME.getFPS(elapsed);
         }
         GAME.displayText.level.text = 'Level: ' + GAME.level.current;
       },
@@ -229,37 +240,46 @@ let buildGame = function(targetID, classes) {
       NEW_GAME : {
         // Sets defaults to zero and clears everything out.
         setup : function(){
-          console.log('NEW_GAME.setup()');
+          //console.log('NEW_GAME.setup()');
           // Any one-time tasks that happen when we switch to this state.
 
           /* Make all the stuff that will always remain on the stage. */
-          GAME.displayText.fps = new createjs.Text("FPS", "14px Arial", GAME.props.textColor);
+          GAME.displayText.level = new createjs.Text("Level: " + GAME.level.current, "24px Arial", GAME.props.textColor);
+          GAME.displayText.level.textAlign = "right";
+          GAME.displayText.level.x = GAME.canvas.width - 10;
+          GAME.displayText.level.y = 10;
+          GAME.displayText.level.name = 'txtLevel';
+          GAME.stage.addChild(GAME.displayText.level);
+
+          GAME.displayText.sleds = new createjs.Text("Sleds: " + GAME.numSleds, "24px Arial", GAME.props.textColor);
+          GAME.displayText.sleds.textAlign = "right";
+          GAME.displayText.sleds.x = GAME.canvas.width - 10;
+          GAME.displayText.sleds.y = 40;
+          GAME.displayText.sleds.name = 'txtSleds';
+          GAME.stage.addChild(GAME.displayText.sleds);
+
+          GAME.displayText.fps = new createjs.Text("", "24px Arial", GAME.props.textColor);
           GAME.displayText.fps.textAlign = "right";
           GAME.displayText.fps.x = GAME.canvas.width - 10;
-          GAME.displayText.fps.y = 10;
+          GAME.displayText.fps.y = 70;
           GAME.displayText.fps.name = 'txtFPS';
           GAME.stage.addChild(GAME.displayText.fps);
 
-          /* Make all the stuff that will always remain on the stage. */
-          GAME.displayText.level = new createjs.Text("Level: " + GAME.level.current, "14px Arial", GAME.props.textColor);
-          GAME.displayText.level.textAlign = "right";
-          GAME.displayText.level.x = GAME.canvas.width - 10;
-          GAME.displayText.level.y = 30;
-          GAME.displayText.level.name = 'txtLevel';
-          GAME.stage.addChild(GAME.displayText.level);
+
+
         },
         frame : function(elapsed){
           //console.log(['-- NEW_GAME.frame()']);
           GAME.state.swap('NEW_LEVEL');
         },
         cleanup : function(){
-          console.log('---- NEW_GAME.cleanup()');
+          //console.log('---- NEW_GAME.cleanup()');
         }
       },
       NEW_LEVEL : {
         // Sets the level knobs
         setup : function(){
-          console.log('NEW_LEVEL.setup()');
+          //console.log('NEW_LEVEL.setup()');
           // Any one-time tasks that happen when we switch to this state.
           GAME.level.current ++;
         },
@@ -268,13 +288,13 @@ let buildGame = function(targetID, classes) {
           GAME.state.swap('PLAYER_START');
         },
         cleanup : function(){
-          console.log('---- NEW_LEVEL.cleanup()');
+          //console.log('---- NEW_LEVEL.cleanup()');
         }
       },
       PLAYER_START : {
         // Fades the player ship in from zero to full
         setup : function(){
-          console.log('PLAYER_START.setup()');
+          //console.log('PLAYER_START.setup()');
           // Any one-time tasks that happen when we switch to this state.
 
           // Dogs are 15 pixels wide.
@@ -283,20 +303,19 @@ let buildGame = function(targetID, classes) {
           GAME.teamDog = new classes.Dog({name:'teamDog', color:'#0f0'});
           GAME.wheelDog = new classes.Dog({name:'wheelDog', color:'#00f'});
 
-          let sledDogs = [
+          GAME.sled = new classes.Sled({
+            x: 50,
+            y: GAME.rows[GAME.currentRow]
+          });
+
+          GAME.sledTeam = [
             GAME.leadDog,
             GAME.swingDog,
             GAME.teamDog,
             GAME.wheelDog,
+            GAME.sled
           ];
 
-          GAME.sled = new classes.Sled({
-            name: 'sled',
-            x: 50,
-            y: GAME.canvas.height/2
-          });
-
-          GAME.sledTeam = sledDogs.concat([GAME.sled]);
           GAME.sled.team = GAME.sledTeam;
 
           GAME.stage.addChild(GAME.sled);
@@ -310,7 +329,6 @@ let buildGame = function(targetID, classes) {
             current.y = GAME.sled.y;
             GAME.stage.addChild(current);
           }
-
         },
         frame : function(elapsed){
           //console.log('-- PLAYER_START.frame()');
@@ -318,7 +336,7 @@ let buildGame = function(targetID, classes) {
           GAME.state.swap('PLAY_LEVEL');
         },
         cleanup : function(){
-          console.log('---- PLAYER_START.cleanup()');
+          //console.log('---- PLAYER_START.cleanup()');
         }
       },
       PLAY_LEVEL : {
@@ -342,7 +360,10 @@ let buildGame = function(targetID, classes) {
 
               case GAME.props.keycodes.UP: // up
                 console.log('up');
-                GAME.sled.moveTeam( 100 );
+                if ( GAME.currentRow > 0 && GAME.sled.ready === true ) {
+                  GAME.currentRow --;
+                  GAME.sled.moveTeam( GAME.rows[GAME.currentRow] );
+                }
                 break;
 
               case GAME.props.keycodes.RIGHT: // right
@@ -351,7 +372,10 @@ let buildGame = function(targetID, classes) {
 
               case GAME.props.keycodes.DOWN: // down
                 console.log('down');
-                GAME.sled.moveTeam( 200 );
+                if ( GAME.currentRow < GAME.rows.length - 1 && GAME.sled.ready === true ) {
+                  GAME.currentRow ++;
+                  GAME.sled.moveTeam( GAME.rows[GAME.currentRow] );
+                }
                 break;
 
               case GAME.props.keycodes.SPACE: // space

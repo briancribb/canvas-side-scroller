@@ -22,7 +22,6 @@ let buildMover = function() {
 		this is just a base class. This exists only to provide common methods to 
 		subsequent classes. 
 		*/
-		this.ready = true;
 	};
 	/*
 	createjs.extend() builds our temporary object up with the parent as it's prototype. 

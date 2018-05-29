@@ -17,7 +17,7 @@ let buildDog = function(classes) {
 		//console.log(['Dog()', this]);
 	};
 
-	Dog.prototype = createjs.extend(Dog, classes.Mover);
+	Dog.prototype = createjs.extend(Dog, createjs.Shape);
 
 	/*
 	var grSled = new createjs.Graphics()

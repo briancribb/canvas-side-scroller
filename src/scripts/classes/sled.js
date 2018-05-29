@@ -12,12 +12,12 @@ let buildSled = function(classes) {
 
 		this.setBounds(  0, 0, this.width, this.height );
 		//this.graphics.beginFill("red").drawCircle(0, 0, 40);
-		this.graphics.beginFill("#FFF").drawRect(0, -this.height, this.width, this.height);
-		//this.graphics = grSled;
-		console.log(['Sled()', this]);
+		//this.graphics.beginFill("#FFF").drawRect(0, -this.height, this.width, this.height);
+		this.graphics = this.setType('blah', this);
+		//console.log(['Sled()', this]);
 	};
 
-	Sled.prototype = createjs.extend(Sled, classes.Mover);
+	Sled.prototype = createjs.extend(Sled, createjs.Shape);
 
 	/*
 	var grSled = new createjs.Graphics()
@@ -26,19 +26,38 @@ let buildSled = function(classes) {
 							.drawRect(-(this.width/2),-(this.height/2),this.width,this.height);
 	*/
 
+	Sled.prototype.setType = function(strType, that) {
+		console.log('*** setType()');
+		var tempGr = new createjs.Graphics();
+
+        switch(strType) {
+			case 'blah':
+				tempGr.beginFill("#FFF").drawRect(0, -that.height, that.width, that.height);
+				break;
+			default:
+				tempGr.beginFill("#FFF").drawRect(0, -that.height, that.width, that.height);
+		}
+		return tempGr;
+	}
+
 	Sled.prototype.moveTeam = function(yPoint) {
 		let sled = this;
-		//sled.moveTo(yPoint);
-		console.log(sled.team);
+
+		sled.ready = false;
 		let waitTime = 0;
 		for (var i = 0; i < sled.team.length; i++) {
-			let dog = sled.team[i];
+			let member = sled.team[i];
 
-			createjs.Tween.get(dog)
+			createjs.Tween.get(member)
 				.wait(waitTime)
 				.to({y:yPoint}, 500)
 				.call(function(){
 					//console.log('All done...');
+					//console.log(member.name);
+					if (member.name === 'leadDog') {
+						sled.ready = true;
+					}
+
 				});
 
 			waitTime += 75;

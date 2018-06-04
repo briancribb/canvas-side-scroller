@@ -11,7 +11,7 @@ classes.Obstacle = createjs.promote(buildObstacle(), "Shape");
 //classes.Dog = createjs.promote(buildDog(classes), classes.Mover);
 let UglyDogs = buildGame("canvasContainer", classes);
 UglyDogs.init();
-//console.log(['index.js', classes, UglyDogs]);
+console.log(UglyDogs);
 
 
 /*

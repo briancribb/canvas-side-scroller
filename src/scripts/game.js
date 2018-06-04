@@ -33,6 +33,7 @@ let buildGame = function(targetID, classes) {
         gameHeight * .84
     ],
     sledTeam: [],
+    obstacles: [],
     displayText :  {
       fps: {},
       level: {}
@@ -70,7 +71,6 @@ let buildGame = function(targetID, classes) {
       GAME.state.swap('LOADING', true);
       GAME.setup.addListeners();
       GAME.play();
-      console.log(GAME);
     },
     setup: {
       createCanvas: function() {
@@ -136,6 +136,11 @@ let buildGame = function(targetID, classes) {
           GAME.displayText.fps.text = "FPS: " + GAME.getFPS(elapsed);
         }
         GAME.displayText.level.text = 'Level: ' + GAME.level.current;
+      },
+      updateObstacles: function( elapsed ) {
+        for (var i = 0; i < GAME.obstacles.length; i++) {
+          GAME.obstacles[i].update(elapsed);
+        };
       },
       hitTestBox: function(object1, object2) {
         var bounds1  = object1.getTransformedBounds(),
@@ -318,6 +323,17 @@ let buildGame = function(targetID, classes) {
 
           GAME.sled.team = GAME.sledTeam;
 
+
+          let point = GAME.sled.localToGlobal(50, 100);
+          GAME.testBlock = new classes.Obstacle({
+            name:'test', 
+            color:'#00f',
+            x: point.x,
+            y: point.y
+          });
+
+
+
           GAME.stage.addChild(GAME.sled);
 
           // Place the dog team.
@@ -329,6 +345,12 @@ let buildGame = function(targetID, classes) {
             current.y = GAME.sled.y;
             GAME.stage.addChild(current);
           }
+
+          GAME.stage.addChild(GAME.testBlock);
+
+
+
+
         },
         frame : function(elapsed){
           //console.log('-- PLAYER_START.frame()');
@@ -371,7 +393,7 @@ let buildGame = function(targetID, classes) {
                 break;
 
               case GAME.props.keycodes.DOWN: // down
-                console.log('down');
+                console.log('down', GAME.sled);
                 if ( GAME.currentRow < GAME.rows.length - 1 && GAME.sled.ready === true ) {
                   GAME.currentRow ++;
                   GAME.sled.moveTeam( GAME.rows[GAME.currentRow] );

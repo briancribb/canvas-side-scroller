@@ -27,7 +27,7 @@ let buildSled = function(classes) {
 	*/
 
 	Sled.prototype.setType = function(strType, that) {
-		console.log('*** setType()');
+		//console.log('*** setType()');
 		var tempGr = new createjs.Graphics();
 
         switch(strType) {
@@ -65,10 +65,30 @@ let buildSled = function(classes) {
 	}
 
 	Sled.prototype.update = function(elapsed) {
+		let that = this;
 
+
+		that.graphics.clear();
+		that.graphics = that.setType('blah', that);
+		that.graphics.beginStroke("#BADA55");
+		that.graphics.moveTo(that.width, -5);
+
+		//let floatingPoint = {x:that.width, y:-5};
+
+		// This does a line from the sled to each dog. Next we will  
+		// go from dog to dog.
+		for (var i = that.team.length - 2; i >= 0; i--) {
+			that.team[i]
+			let gp = that.team[ i ].localToGlobal(7,-5);
+			let lp = that.globalToLocal(gp.x, gp.y);
+			that.graphics.lineTo(lp.x, lp.y);
+			// Get previous array item's point
+			// Get this array item's point.
+			// Line..
+		}
 	}
 
-
+ 
 
 
 	return Sled;	

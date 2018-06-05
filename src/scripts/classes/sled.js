@@ -50,7 +50,7 @@ let buildSled = function(classes) {
 
 			createjs.Tween.get(member)
 				.wait(waitTime)
-				.to({y:yPoint}, 500)
+				.to({y:yPoint}, 750, createjs.Ease.quadInOut)
 				.call(function(){
 					//console.log('All done...');
 					//console.log(member.name);
@@ -60,28 +60,26 @@ let buildSled = function(classes) {
 
 				});
 
-			waitTime += 75;
+			waitTime += 100;
 		}
 	}
 
 	Sled.prototype.update = function(elapsed) {
 		let that = this;
-
+		let localTarget = {x:7, y:-5};
 
 		that.graphics.clear();
 		that.graphics = that.setType('blah', that);
-		that.graphics.beginStroke("#BADA55");
-		that.graphics.moveTo(that.width, -5);
+		that.graphics.beginStroke("#fff").setStrokeStyle(2);
+		that.graphics.moveTo(that.width, localTarget.y);
 
-		//let floatingPoint = {x:that.width, y:-5};
 
 		// This does a line from the sled to each dog. Next we will  
 		// go from dog to dog.
 		for (var i = that.team.length - 2; i >= 0; i--) {
-			that.team[i]
-			let gp = that.team[ i ].localToGlobal(7,-5);
+			let gp = that.team[ i ].localToGlobal(localTarget.x, localTarget.y);
 			let lp = that.globalToLocal(gp.x, gp.y);
-			that.graphics.lineTo(lp.x, lp.y);
+			that.graphics.lineTo(lp.x, lp.y).moveTo(lp.x, lp.y);
 			// Get previous array item's point
 			// Get this array item's point.
 			// Line..

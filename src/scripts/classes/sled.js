@@ -1,7 +1,7 @@
 let buildSled = function(classes) {
 	function Sled(settings = {}) {
 		this.Shape_constructor();
-		this.name	= settings.name || '';
+		this.name	= settings.name || 'sled';
 		this.x		= settings.x || 0;
 		this.y		= settings.y || 0;
 		this.width	= 25;
@@ -32,10 +32,10 @@ let buildSled = function(classes) {
 
         switch(strType) {
 			case 'blah':
-				tempGr.beginFill("#FFF").drawRect(0, -that.height, that.width, that.height);
+				tempGr.beginFill("#000").drawRect(0, -that.height, that.width, that.height);
 				break;
 			default:
-				tempGr.beginFill("#FFF").drawRect(0, -that.height, that.width, that.height);
+				tempGr.beginFill("#000").drawRect(0, -that.height, that.width, that.height);
 		}
 		return tempGr;
 	}
@@ -50,11 +50,11 @@ let buildSled = function(classes) {
 
 			createjs.Tween.get(member)
 				.wait(waitTime)
-				.to({y:yPoint}, 750, createjs.Ease.quadInOut)
+				.to({y:yPoint}, 500, createjs.Ease.quadInOut)
 				.call(function(){
 					//console.log('All done...');
 					//console.log(member.name);
-					if (member.name === 'leadDog') {
+					if (member.name === 'sled') {
 						sled.ready = true;
 					}
 
@@ -70,7 +70,7 @@ let buildSled = function(classes) {
 
 		that.graphics.clear();
 		that.graphics = that.setType('blah', that);
-		that.graphics.beginStroke("#fff").setStrokeStyle(2);
+		that.graphics.beginStroke("#000").setStrokeStyle(2);
 		that.graphics.moveTo(that.width, localTarget.y);
 
 

@@ -7,9 +7,11 @@ let buildGame = function(targetID, classes) {
 
   let GAME = {
     props: {
+      now:null,           // "now" and "then" get initial values in GAME.setup.addListeners().
+      then:null,
       width:gameWidth,    // Used when creating the canvas and testing its bounds.
       height:gameHeight,
-      textColor: '#FFFD8A',
+      textColor: '#333333',
       keycodes: {
         p:    80, 
         n:    78,
@@ -41,7 +43,9 @@ let buildGame = function(targetID, classes) {
     numSleds : 3,
     level:{
       current:1,
+      baseSpeed: 120,
       knobs: {
+        speed: 5 // Speed of obstacles per second.
       }
     },
     pause: function() {
@@ -117,15 +121,24 @@ let buildGame = function(targetID, classes) {
     },
     tick: function(event) {
       if ( createjs.Ticker.paused === false ) {
-        //console.log('GAME.tick()');
-        GAME.state.current.frame( createjs.Ticker.getEventTime() );
+        //GAME.updateInterval();
+        GAME.state.current.frame( GAME.updateInterval() );
         GAME.stage.update(event); // important!!
       }
     },
     getFPS: function(elapsed) {
       return parseInt(createjs.Ticker.getMeasuredFPS());
     },
+    updateInterval: function() {
+      GAME.props.now = Date.now();
+      var interval = (GAME.props.now - GAME.props.then) / 1000;// seconds since last frame.
+      GAME.props.then = GAME.props.now;
+      return interval;
+    },
     utils: {
+      getRandom: function(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+      },
       resetListeners: function() {
         GAME.props.handlers.onkeydown = function(){return;};
         GAME.props.handlers.onkeyup = function(){return;};
@@ -137,9 +150,47 @@ let buildGame = function(targetID, classes) {
         }
         GAME.displayText.level.text = 'Level: ' + GAME.level.current;
       },
+      addObstacle: function( x, y, type = null ) {
+          var tempBlock = new classes.Obstacle({
+            type: type, 
+            x: x,
+            y: y
+          });
+          GAME.obstacles.push(tempBlock);
+          GAME.stage.addChild(tempBlock);
+      },
+      addObstacleSet: function(x) {
+        let numObj = GAME.utils.getRandom(3) + 1;
+        let positions = [].concat(GAME.rows);
+        let yValues = [];
+
+        console.log('numObj', numObj);
+
+        for (var i = 0; i < numObj; i++) {
+          let tempIndex = GAME.utils.getRandom(positions.length);
+          //console.log('-- '+tempIndex);
+          yValues.push(positions[tempIndex]);
+          positions.splice(tempIndex,1);
+        }
+        console.log([GAME.rows, yValues, positions]);
+
+        for (var i = 0; i < yValues.length; i++) {
+          GAME.utils.addObstacle(x,  yValues[i], 'regular');
+        }
+
+      },
       updateObstacles: function( elapsed ) {
-        for (var i = 0; i < GAME.obstacles.length; i++) {
-          GAME.obstacles[i].update(elapsed);
+        if (GAME.obstacles.length === 0) return;
+
+        let speed = GAME.level.baseSpeed + GAME.level.knobs.speed;
+
+        for (var i = GAME.obstacles.length - 1; i >= 0; i--) {
+          if ( GAME.obstacles[i].x < -(GAME.obstacles[i].width+10) ) {
+            GAME.stage.removeChild(GAME.obstacles[i]);
+            GAME.obstacles.splice(i, 1);
+          } else {
+            GAME.obstacles[i].update(elapsed, speed);
+          }
         };
       },
       hitTestBox: function(object1, object2) {
@@ -248,6 +299,11 @@ let buildGame = function(targetID, classes) {
           //console.log('NEW_GAME.setup()');
           // Any one-time tasks that happen when we switch to this state.
 
+
+          let bgGraphics = new createjs.Graphics().beginFill("#fff").drawRect(0, 0, GAME.props.width, GAME.props.height);
+          GAME.background = new createjs.Shape(bgGraphics);
+          GAME.stage.addChild(GAME.background);
+
           /* Make all the stuff that will always remain on the stage. */
           GAME.displayText.level = new createjs.Text("Level: " + GAME.level.current, "24px Arial", GAME.props.textColor);
           GAME.displayText.level.textAlign = "right";
@@ -268,10 +324,8 @@ let buildGame = function(targetID, classes) {
           GAME.displayText.fps.x = GAME.canvas.width - 10;
           GAME.displayText.fps.y = 70;
           GAME.displayText.fps.name = 'txtFPS';
+
           GAME.stage.addChild(GAME.displayText.fps);
-
-
-
         },
         frame : function(elapsed){
           //console.log(['-- NEW_GAME.frame()']);
@@ -321,20 +375,9 @@ let buildGame = function(targetID, classes) {
             GAME.sled
           ];
 
+
           GAME.sled.team = GAME.sledTeam;
-
-
-          let point = GAME.sled.localToGlobal(50, 100);
-          GAME.testBlock = new classes.Obstacle({
-            name:'test', 
-            color:'#00f',
-            x: point.x,
-            y: point.y
-          });
-
-
-
-          GAME.stage.addChild(GAME.sled);
+          //GAME.sled.teamWidth = (GAME.leadDog.x + GAME.leadDog.width) - GAME.sled.x
 
           // Place the dog team.
           for (var i = GAME.sledTeam.length - 2; i >= 0; i--) {
@@ -345,12 +388,9 @@ let buildGame = function(targetID, classes) {
             current.y = GAME.sled.y;
             GAME.stage.addChild(current);
           }
+          GAME.stage.addChild(GAME.sled);
 
-          GAME.stage.addChild(GAME.testBlock);
-
-
-
-
+          GAME.utils.addObstacleSet(300);
         },
         frame : function(elapsed){
           //console.log('-- PLAYER_START.frame()');
@@ -425,8 +465,9 @@ let buildGame = function(targetID, classes) {
           // (elapsedTimeInMS / 1000msPerSecond * pixelsPerSecond):
           GAME.utils.updateText();
           for (var i = GAME.sledTeam.length - 1; i >= 0; i--) {
-            GAME.sledTeam[i].update();
+            GAME.sledTeam[i].update(elapsed);
           }
+          GAME.utils.updateObstacles(elapsed);
           // GAME.state.swap('PLAYER_DIE');
         },
         cleanup : function(){

@@ -9,6 +9,7 @@ let buildDog = function(classes) {
 		this.regX	= settings.regX || 0;
 		this.regY	= settings.regY || 0;
 		this.color	= settings.color || '#fff';
+		this.ready	= true;
 
 		this.setBounds(  0, 0, this.width, this.height );
 		//this.graphics.beginFill("red").drawCircle(0, 0, 40);

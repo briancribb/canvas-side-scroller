@@ -28,7 +28,7 @@ let buildObstacle = function(classes) {
 	*/
 
 	Obstacle.prototype.setType = function(strType, that) {
-		console.log('*** setType()');
+
 		var tempGr = new createjs.Graphics();
 		tempGr.beginFill(that.color);
         switch(strType) {
@@ -51,7 +51,7 @@ let buildObstacle = function(classes) {
 
 	Obstacle.prototype.update = function(elapsed, speed) {
 		//console.log(elapsed);
-		//this.x -= (speed * elapsed);
+		this.x -= (speed * elapsed);
 	}
 
 	return Obstacle;	

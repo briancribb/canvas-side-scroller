@@ -36,6 +36,7 @@ let buildGame = function(targetID, classes) {
     ],
     sledTeam: [],
     obstacles: [],
+    rightmostPoint: 0,
     displayText :  {
       fps: {},
       level: {}
@@ -164,34 +165,42 @@ let buildGame = function(targetID, classes) {
         let positions = [].concat(GAME.rows);
         let yValues = [];
 
-        console.log('numObj', numObj);
-
         for (var i = 0; i < numObj; i++) {
           let tempIndex = GAME.utils.getRandom(positions.length);
           //console.log('-- '+tempIndex);
           yValues.push(positions[tempIndex]);
           positions.splice(tempIndex,1);
         }
-        console.log([GAME.rows, yValues, positions]);
 
         for (var i = 0; i < yValues.length; i++) {
           GAME.utils.addObstacle(x,  yValues[i], 'regular');
         }
-
       },
       updateObstacles: function( elapsed ) {
         if (GAME.obstacles.length === 0) return;
 
         let speed = GAME.level.baseSpeed + GAME.level.knobs.speed;
-
+        GAME.rightmostPoint = 0;
         for (var i = GAME.obstacles.length - 1; i >= 0; i--) {
           if ( GAME.obstacles[i].x < -(GAME.obstacles[i].width+10) ) {
             GAME.stage.removeChild(GAME.obstacles[i]);
             GAME.obstacles.splice(i, 1);
           } else {
             GAME.obstacles[i].update(elapsed, speed);
+            let rightEdge = GAME.obstacles[i].x + GAME.obstacles[i].width;
+
+            // Keep track of the furthest edge of an object.
+            if (rightEdge > GAME.rightmostPoint) {
+              GAME.rightmostPoint = rightEdge;
+            }
           }
         };
+
+        //console.log(GAME.rightmostPoint);
+        if ( GAME.rightmostPoint < (GAME.props.width - GAME.teamWidth) ) {
+          GAME.utils.addObstacleSet(GAME.props.width + 10);
+        }
+
       },
       hitTestBox: function(object1, object2) {
         var bounds1  = object1.getTransformedBounds(),
@@ -377,7 +386,6 @@ let buildGame = function(targetID, classes) {
 
 
           GAME.sled.team = GAME.sledTeam;
-          //GAME.sled.teamWidth = (GAME.leadDog.x + GAME.leadDog.width) - GAME.sled.x
 
           // Place the dog team.
           for (var i = GAME.sledTeam.length - 2; i >= 0; i--) {
@@ -390,7 +398,10 @@ let buildGame = function(targetID, classes) {
           }
           GAME.stage.addChild(GAME.sled);
 
-          GAME.utils.addObstacleSet(300);
+          // Get the length of the whole team
+          GAME.teamWidth = (GAME.leadDog.x + GAME.leadDog.width) - GAME.sled.x
+
+          GAME.utils.addObstacleSet(GAME.props.width + 10);
         },
         frame : function(elapsed){
           //console.log('-- PLAYER_START.frame()');

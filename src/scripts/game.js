@@ -1,11 +1,12 @@
 let buildGame = function(targetID, classes) {
   "use strict"
   // The targetID variable is available to the entire file.
-  let gameWidth = 600,
-      gameHeight = 400;
+  let gameWidth = 500,
+      gameHeight = 300;
 
 
   let GAME = {
+    classes:classes,
     props: {
       now:null,           // "now" and "then" get initial values in GAME.setup.addListeners().
       then:null,
@@ -13,13 +14,13 @@ let buildGame = function(targetID, classes) {
       height:gameHeight,
       textColor: '#333333',
       keycodes: {
-        p:    80, 
-        n:    78,
+        p:      80, 
+        n:      78,
         SPACE:  32,
-        LEFT: 37,
+        LEFT:   37,
         RIGHT:  39,
-        UP:   38, 
-        DOWN: 40
+        UP:     38, 
+        DOWN:   40
       },
       handlers: {
         onkeydown:function(){return;},
@@ -28,11 +29,11 @@ let buildGame = function(targetID, classes) {
     },
     currentRow:2,
     rows:[
-        gameHeight * .20,
-        gameHeight * .36,
-        gameHeight * .52,
-        gameHeight * .68,
-        gameHeight * .84
+        gameHeight * .20,// 80
+        gameHeight * .36,// 144
+        gameHeight * .52,// 208
+        gameHeight * .68,// 272
+        gameHeight * .84 // 336
     ],
     sledTeam: [],
     obstacles: [],
@@ -75,50 +76,11 @@ let buildGame = function(targetID, classes) {
       GAME.setup.createCanvas(targetID);
       GAME.state.swap('LOADING', true);
       GAME.setup.addListeners();
+
+
+
+
       GAME.play();
-    },
-    setup: {
-      createCanvas: function() {
-        GAME.canvas = document.createElement('canvas');
-        GAME.canvas.width = GAME.props.width;
-        GAME.canvas.height = GAME.props.height;
-        GAME.context = GAME.canvas.getContext('2d');
-        document.getElementById(targetID).appendChild(GAME.canvas);
-
-        GAME.stage = new createjs.Stage(GAME.canvas);
-
-        // Setting bounds so CreateJS doesn't keep calculating them.
-        GAME.stage.setBounds(0, 0, GAME.props.width, GAME.props.height);
-      },
-      addListeners: function() {
-        // Visibility API
-        document.addEventListener(GAME.visibilityChange, function() {
-          if(GAME.document_hidden !== document[GAME.hidden]) {
-          if(document[GAME.hidden]) {
-            // Pause the animation when the document is hidden.
-            GAME.pause();
-          } else {
-            // When the document is visible, play the animation.
-            GAME.play();
-          }
-          GAME.document_hidden = document[GAME.hidden];
-          }
-        });
-
-        // http://stackoverflow.com/questions/1402698/binding-arrow-keys-in-js-jquery
-        document.onkeydown = function(event) {
-          GAME.props.handlers.onkeydown( event || window.event );
-          event.preventDefault(); // prevent the default action (scroll / move caret)
-        };
-        document.onkeyup = function(event) {
-          GAME.props.handlers.onkeyup( event || window.event );
-          event.preventDefault(); // prevent the default action (scroll / move caret)
-        };
-
-        // CreateJS Ticker
-        createjs.Ticker.on("tick", GAME.tick);
-        createjs.Ticker.timingMode = createjs.Ticker.RAF;
-      }
     },
     tick: function(event) {
       if ( createjs.Ticker.paused === false ) {
@@ -135,109 +97,6 @@ let buildGame = function(targetID, classes) {
       var interval = (GAME.props.now - GAME.props.then) / 1000;// seconds since last frame.
       GAME.props.then = GAME.props.now;
       return interval;
-    },
-    utils: {
-      getRandom: function(max) {
-        return Math.floor(Math.random() * Math.floor(max));
-      },
-      resetListeners: function() {
-        GAME.props.handlers.onkeydown = function(){return;};
-        GAME.props.handlers.onkeyup = function(){return;};
-      },
-      updateText: function( elapsed ) {
-        //console.log('updateText()');
-        if (createjs.Ticker.getTicks() % 20 == 0) {
-          GAME.displayText.fps.text = "FPS: " + GAME.getFPS(elapsed);
-        }
-        GAME.displayText.level.text = 'Level: ' + GAME.level.current;
-      },
-      addObstacle: function( x, y, type = null ) {
-          var tempBlock = new classes.Obstacle({
-            type: type, 
-            x: x,
-            y: y
-          });
-          GAME.obstacles.push(tempBlock);
-          GAME.stage.addChild(tempBlock);
-      },
-      addObstacleSet: function(x) {
-        let numObj = GAME.utils.getRandom(3) + 1;
-        let positions = [].concat(GAME.rows);
-        let yValues = [];
-
-        for (var i = 0; i < numObj; i++) {
-          let tempIndex = GAME.utils.getRandom(positions.length);
-          //console.log('-- '+tempIndex);
-          yValues.push(positions[tempIndex]);
-          positions.splice(tempIndex,1);
-        }
-
-        for (var i = 0; i < yValues.length; i++) {
-          GAME.utils.addObstacle(x,  yValues[i], 'regular');
-        }
-      },
-      updateObstacles: function( elapsed ) {
-        if (GAME.obstacles.length === 0) return;
-
-        let speed = GAME.level.baseSpeed + GAME.level.knobs.speed;
-        GAME.rightmostPoint = 0;
-        for (var i = GAME.obstacles.length - 1; i >= 0; i--) {
-          if ( GAME.obstacles[i].x < -(GAME.obstacles[i].width+10) ) {
-            GAME.stage.removeChild(GAME.obstacles[i]);
-            GAME.obstacles.splice(i, 1);
-          } else {
-            GAME.obstacles[i].update(elapsed, speed);
-            let rightEdge = GAME.obstacles[i].x + GAME.obstacles[i].width;
-
-            // Keep track of the furthest edge of an object.
-            if (rightEdge > GAME.rightmostPoint) {
-              GAME.rightmostPoint = rightEdge;
-            }
-          }
-        };
-
-        //console.log(GAME.rightmostPoint);
-        if ( GAME.rightmostPoint < (GAME.props.width - GAME.teamWidth) ) {
-          GAME.utils.addObstacleSet(GAME.props.width + 10);
-        }
-
-      },
-      hitTestBox: function(object1, object2) {
-        var bounds1  = object1.getTransformedBounds(),
-            bounds2 = object2.getTransformedBounds();
-
-        var left1  = bounds1.x,
-            left2 = bounds2.x,
-            right1  = bounds1.x + bounds1.width,
-            right2  = bounds2.x + bounds2.width,
-            top1    = bounds1.y,
-            top2    = bounds2.y,
-            bottom1 = bounds1.y + bounds1.height,
-            bottom2 = bounds2.y + bounds2.height;
-
-        if (bottom1 < top2) return(false);
-        if (top1 > bottom2) return(false);
-
-        if (right1 < left2) return(false);
-        if (left1 > right2) return(false);
-
-        return(true);
-      },
-      hitTestDistance: function(object1, object2) {
-        var  bounds1  = object1.getTransformedBounds(),
-            bounds2 = object2.getTransformedBounds();
-
-        var dx = (bounds2.x + object2.regX) - (bounds1.x + object1.regX),
-            dy = (bounds2.y + object2.regY) - (bounds1.y + object1.regY),
-            dist = Math.sqrt(dx * dx + dy * dy);
-
-        if ( dist < object1.radius + object2.radius ) {
-            return true;
-        }
-        return false;
-      },
-      checkHits: function() {
-      }
     },
     state: {
       current : null,

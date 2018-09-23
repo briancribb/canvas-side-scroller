@@ -50,7 +50,7 @@ let buildSled = function(classes) {
 
 			createjs.Tween.get(member)
 				.wait(waitTime)
-				.to({y:yPoint}, 500, createjs.Ease.quadInOut)
+				.to({y:yPoint}, 300, createjs.Ease.quadInOut)
 				.call(function(){
 					//console.log('All done...');
 					//console.log(member.name);
